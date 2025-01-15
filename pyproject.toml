@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcts"
+version = "0.1.0"
+description = "A Python library for Monte Carlo Search Tree algorithms."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Your Name", email = "your.email@example.com" }]
+dependencies = [
+    "numpy",
+]
+
+keywords = ["monte carlo", "search tree", "optimization"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.8"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--strict-markers"
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]
+
+[tool.isort]
+profile = "black"
