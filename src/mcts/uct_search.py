@@ -42,7 +42,7 @@ class UCTNode:
         unexplored_actions = [
             action for action in valid_actions if action not in explored_actions
         ]
-        unexplored_action = unexplored_actions[0]
+        unexplored_action = random.choice(unexplored_actions)
 
         game = self.board_state.clone()
         _, reward, finished, _ = game.step(unexplored_action)

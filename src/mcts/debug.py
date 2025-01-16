@@ -1,6 +1,7 @@
 import numpy as np
 from .uct_search import UCTNode
 
+
 def render_board(node: UCTNode):
     html_string = ""
     for child in node.children.values():
@@ -86,3 +87,58 @@ def render_tree(node: UCTNode):
     html_string += "</body></html>"
 
     return html_string
+
+
+def extract_information_from_tree(node):
+    """
+
+    Output: [number of children, ucb score of each child, action of chosen child, ...]
+
+    """
+    root = node
+    while root.parent:
+        root = root.parent
+
+    info = []
+
+    counter = 0
+
+    while not root.is_terminal:
+        temp = []
+        next_root = None
+
+        children = root.children.keys()
+        children = sorted(children)
+
+        l = len(children)
+
+        if counter % 2 == 0:
+          temp.append(l)
+        for i in children:
+            if counter % 2 == 0:
+              temp.append(i)
+              temp.append(root.children[i].ucb_score().item())
+
+            if root.children[i].chosen:
+                next_root = root.children[i]
+        if counter % 2 == 0:
+            temp.append(next_root.action)
+        info += temp
+        root = next_root
+
+        counter += 1
+
+    return info
+
+
+def count_nodes(node):
+    count = 1
+    for child in node.children.values():
+        count += count_nodes(child)
+    return count
+
+
+def depth(node):
+    if not node.children:
+        return 1
+    return 1 + max(depth(child) for child in node.children.values())

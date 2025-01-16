@@ -1,6 +1,8 @@
 import pytest
 from mcts.game import Game
 from mcts.uct_search import UCTSearch
+from mcts.debug import depth, count_nodes, extract_information_from_tree
+import random
 
 from gym_connect4.envs import Connect4Env
 
@@ -42,17 +44,6 @@ def test_mcts_expansion_1():
     assert len(tree.root.children) == 7
 
 
-def count_nodes(node):
-    count = 1
-    for child in node.children.values():
-        count += count_nodes(child)
-    return count
-
-
-def depth(node):
-    if not node.children:
-        return 1
-    return 1 + max(depth(child) for child in node.children.values())
 
 
 def test_mcts_expansion_2():
@@ -76,3 +67,29 @@ def test_mcts_expansion_3():
     children = tree.root.children
     children_count_distribution = [len(child.children) for child in children.values()]
     assert children_count_distribution == [3,3,3,3,3,3,3]
+
+def test_information_gathering():
+    """Test that the tree policy selects the correct node."""
+    c4_game = Connect4Game()
+
+    finished = False
+
+    mcts = UCTSearch(50, c4_game.clone())
+
+    while not finished:
+
+        # our play
+        action = mcts.determine_next_move()
+
+        _, reward, finished, _ = c4_game.step(action)
+        mcts.update(action, c4_game, finished, reward[0])
+
+        # player 2
+        if not finished:
+            player_2_action = random.choice(c4_game.get_moves())
+            _, reward, finished, _ = c4_game.step(player_2_action)
+            mcts.update(player_2_action, c4_game, finished, reward[0])
+
+    extracted_info = extract_information_from_tree(mcts.root)
+
+    assert len(extracted_info) == 4
