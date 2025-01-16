@@ -7,18 +7,18 @@ from gym_connect4.envs import Connect4Env
 
 class Connect4Game(Game):
 
-    def __init__(self, game = Connect4Env()):
+    def __init__(self, game=Connect4Env()):
         self.env = game
 
     def get_moves(self):
         return self.env.get_moves()
-    
+
     def step(self, action):
         return self.env.step(action)
-    
+
     def is_terminal(self):
         return self.env.is_terminal()
-    
+
     def clone(self):
         cloned_game = self.env.clone()
         return Connect4Game(cloned_game)
@@ -34,9 +34,45 @@ def test_mcts_initialization():
     assert tree is not None
 
 
-def test_mcts_expansion():
+def test_mcts_expansion_1():
     """Test that the Monte Carlo Search Tree expands correctly."""
     game = Connect4Game()
     tree = UCTSearch(7, game.clone())
     tree.determine_next_move()
     assert len(tree.root.children) == 7
+
+
+def count_nodes(node):
+    count = 1
+    for child in node.children.values():
+        count += count_nodes(child)
+    return count
+
+
+def depth(node):
+    if not node.children:
+        return 1
+    return 1 + max(depth(child) for child in node.children.values())
+
+
+def test_mcts_expansion_2():
+    """Test that the Monte Carlo Search Tree expands correctly."""
+    n = 24
+    game = Connect4Game()
+    tree = UCTSearch(n, game.clone())
+    tree.determine_next_move()
+    assert (
+        (count_nodes(tree.root) == n + 1)
+        and (len(tree.root.children) == 7)
+        and (depth(tree.root) == 3)
+    )
+
+def test_mcts_expansion_3():
+    """Test that the Monte Carlo Search Tree expands correctly."""
+    n = 24
+    game = Connect4Game()
+    tree = UCTSearch(n, game.clone())
+    tree.determine_next_move()
+    children = tree.root.children
+    children_count_distribution = [len(child.children) for child in children.values()]
+    assert children_count_distribution == [3,3,3,3,3,3,3]

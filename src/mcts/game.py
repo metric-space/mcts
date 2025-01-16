@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, Tuple
+from gym_connect4.envs import Connect4Env
 
 
 class Game(ABC):
@@ -39,3 +40,23 @@ class Game(ABC):
         pass
 
 
+class Connect4Game(Game):
+
+    def __init__(self, game=None):
+        self.env = game or Connect4Env()
+
+    def get_moves(self):
+        return self.env.get_moves()
+
+    def step(self, action):
+        return self.env.step(action)
+
+    def is_terminal(self):
+        return self.env.is_terminal()
+
+    def clone(self):
+        cloned_game = self.env.clone()
+        return Connect4Game(cloned_game)
+
+    def game_state(self):
+        return (self.env.board, self.env.current_player)
